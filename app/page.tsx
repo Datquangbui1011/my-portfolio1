@@ -4,10 +4,9 @@
 import type React from "react"
 import { Github, Linkedin, Mail } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useState } from "react"
 
 import TechMarquee from "@/components/TechMarquee"
 import Modal from "@/components/Modal"
@@ -194,7 +193,7 @@ export default function Portfolio() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {Object.entries(skills).map(([category, skillList], catIndex) => (
+              {Object.entries(skills).map(([category, skillList]) => (
                 <div
                   key={category}
                   className="bg-zinc-900/50 border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900 transition-colors duration-300"
