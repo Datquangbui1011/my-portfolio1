@@ -2,7 +2,7 @@
 
 // Import necessary libraries and components
 import type React from "react"
-import { Github, Linkedin, Mail } from "lucide-react"
+import { Github, Linkedin, Mail, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
@@ -357,12 +357,26 @@ export default function Portfolio() {
                           {project.description}
                         </p>
                       </div>
-                      <Link
-                        href={project.github}
-                        className="bg-white text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:scale-110"
-                      >
-                        <Github className="w-5 h-5" />
-                      </Link>
+                      <div className="flex gap-2">
+                        {project.demo && (
+                          <Link
+                            href={project.demo}
+                            className="bg-blue-500 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:scale-110"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </Link>
+                        )}
+                        <Link
+                          href={project.github}
+                          className="bg-white text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:scale-110"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Github className="w-5 h-5" />
+                        </Link>
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
@@ -511,7 +525,7 @@ const skills = {
   Frontend: ["HTML", "CSS", "React", "Tailwind CSS", "Vite"],
   Backend: ["Node.js", "ASP.NET", "FastAPI", "REST APIs"],
   Databases: ["MySQL", "PostgreSQL", "SQL Server", "MongoDB", "Supabase"],
-  "Cloud & DevOps": ["Vercel", "MongoDB Atlas"],
+  "Cloud & DevOps": ["Vercel", "MongoDB Atlas", "Azure", "Docker"],
   Tools: ["Git", "GitHub", "Visual Studio Code", "Eclipse", "Power BI", "MATLAB", "Power Automate", "Power App"],
 }
 
@@ -605,6 +619,14 @@ const projects = [
     github: "https://github.com/Datquangbui1011/Cornhack-Project",
     image: "/sidequest.png", // <-- your image path here
   },
+  {
+    title: "DB CINEMA",
+    description: "A full-stack cinema ticketing platform with user authentication, movie booking, and payment processing.",
+    technologies: ["MongoDB", "Express", "React", "Node.js", "Vite"],
+    github: "https://github.com/Datquangbui1011/DB-cinema",
+    demo: "https://movie-ticket-booking-client-three.vercel.app/",
+    image: "/dbcinema.png", // <-- your image path here
+  }
 
 
 ]
