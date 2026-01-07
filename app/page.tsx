@@ -624,7 +624,7 @@ const projects = [
     description: "A full-stack cinema ticketing platform with user authentication, movie booking, and payment processing.",
     technologies: ["MongoDB", "Express", "React", "Node.js", "Vite"],
     github: "https://github.com/Datquangbui1011/DB-cinema",
-    demo: "https://movie-ticket-booking-client-three.vercel.app/",
+    demo: "https://db-cinema-n6zt.vercel.app/",
     image: "/dbcinema.png", // <-- your image path here
   }
 
