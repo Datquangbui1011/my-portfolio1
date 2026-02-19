@@ -43,6 +43,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 20 }}
                             transition={{ type: "spring", duration: 0.5 }}
+                            onMouseLeave={onClose}
                             className="bg-zinc-900 border border-white/10 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-[2rem] shadow-2xl pointer-events-auto"
                         >
                             <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-white/5 bg-zinc-900/80 backdrop-blur-md">

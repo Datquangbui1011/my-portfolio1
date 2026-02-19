@@ -10,6 +10,7 @@ import { useRef, useState } from "react"
 
 import TechMarquee from "@/components/TechMarquee"
 import Modal from "@/components/Modal"
+import Spline from "@splinetool/react-spline"
 
 // Define types for data
 interface Experience {
@@ -70,16 +71,22 @@ export default function Portfolio() {
 
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center py-20 w-full bg-black relative overflow-hidden">
+        {/* Spline Background */}
+        <div className="absolute inset-0 z-0">
+          <Spline scene="https://prod.spline.design/2WpB7nRQMkqUS30m/scene.splinecode" />
+          {/* Overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+        </div>
 
         {/* Content */}
-        <div className="z-10 flex flex-col items-center text-center max-w-4xl mx-auto px-4 mt-20">
+        <div className="z-10 flex flex-col items-center text-center max-w-4xl mx-auto px-4 mt-20 pointer-events-none">
 
           {/* Avatar */}
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="mb-8 relative"
+            className="mb-8 relative pointer-events-auto"
           >
             <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-white/10 shadow-2xl">
               <img src="/Dat.jpeg" alt="Dat Bui" className="w-full h-full object-cover" />
@@ -91,7 +98,7 @@ export default function Portfolio() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-6xl md:text-8xl font-bold text-white mb-4 tracking-tight"
+            className="text-6xl md:text-8xl font-bold text-white mb-4 tracking-tight pointer-events-auto"
           >
             Dat Bui
           </motion.h1>
@@ -100,7 +107,7 @@ export default function Portfolio() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-3xl md:text-5xl font-bold text-gray-500 mb-12"
+            className="text-3xl md:text-5xl font-bold text-gray-500 mb-12 pointer-events-auto"
           >
             Software Engineer Student
           </motion.h2>
@@ -114,7 +121,7 @@ export default function Portfolio() {
           />
 
           {/* Stats */}
-          <div className="flex gap-16 md:gap-32">
+          <div className="flex gap-16 md:gap-32 pointer-events-auto">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -238,42 +245,12 @@ export default function Portfolio() {
             <div className="relative max-w-4xl mx-auto">
               <div className="space-y-4">
                 {workExperience.map((experience, index) => (
-                  <motion.div
+                  <ExperienceCard
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    viewport={{ once: true }}
+                    experience={experience}
+                    index={index}
                     onClick={() => setSelectedExperience(experience)}
-                    className="group cursor-pointer bg-zinc-900/50 border border-white/5 hover:bg-zinc-800 hover:border-white/20 rounded-[1.5rem] p-6 transition-all duration-300 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                        <span className="text-xl font-bold text-white/50 group-hover:text-white transition-colors">
-                          {experience.company.charAt(0)}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
-                          {experience.position}
-                        </h3>
-                        <p className="text-gray-400">{experience.company}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-500 hidden md:block">{experience.dates}</span>
-                      <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors">
-                        <svg
-                          className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors transform group-hover:translate-x-0.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </motion.div>
+                  />
                 ))}
               </div>
             </div>
@@ -289,7 +266,6 @@ export default function Portfolio() {
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-6 border-b border-white/10">
                     <div>
                       <h4 className="text-xl font-semibold text-white mb-1">{selectedExperience.company}</h4>
-                      <p className="text-blue-400 text-sm">Software Engineering</p>
                     </div>
                     <span className="px-4 py-2 bg-white/5 rounded-full text-sm text-gray-300 whitespace-nowrap">
                       {selectedExperience.dates}
@@ -498,6 +474,70 @@ export default function Portfolio() {
   )
 }
 
+// Experience Card Component with Hover-to-Open Logic
+function ExperienceCard({ experience, index, onClick }: { experience: Experience; index: number; onClick: () => void }) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleMouseEnter = () => {
+    timeoutRef.current = setTimeout(() => {
+      onClick()
+    }, 500)
+  }
+
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+  }
+
+  const handleClick = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    onClick()
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      viewport={{ once: true }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      className="group cursor-pointer bg-zinc-900/50 border border-white/5 hover:bg-zinc-800 hover:border-white/20 rounded-[1.5rem] p-6 transition-all duration-300 flex items-center justify-between"
+    >
+      <div className="flex items-center gap-6">
+        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+          <span className="text-xl font-bold text-white/50 group-hover:text-white transition-colors">
+            {experience.company.charAt(0)}
+          </span>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
+            {experience.position}
+          </h3>
+          <p className="text-gray-400">{experience.company}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-gray-500 hidden md:block">{experience.dates}</span>
+        <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors">
+          <svg
+            className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors transform group-hover:translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 // Animated Section Component
 function AnimatedSection({ children, id, className }: { children: React.ReactNode; id?: string; className?: string }) {
   const ref = useRef(null)
@@ -521,35 +561,46 @@ function AnimatedSection({ children, id, className }: { children: React.ReactNod
 
 // Sample data
 const skills = {
-  "Programming Languages": ["Python", "Java", "C", "C++", "C#", "JavaScript", "TypeScript", "SQL", "Swift"],
-  Frontend: ["HTML", "CSS", "React", "Tailwind CSS", "Vite"],
-  Backend: ["Node.js", "ASP.NET", "FastAPI", "REST APIs"],
-  Databases: ["MySQL", "PostgreSQL", "SQL Server", "MongoDB", "Supabase"],
-  "Cloud & DevOps": ["Vercel", "MongoDB Atlas", "Azure", "Docker"],
-  Tools: ["Git", "GitHub", "Visual Studio Code", "Eclipse", "Power BI", "MATLAB", "Power Automate", "Power App"],
+  "Programming Languages": ["Python", "Java", "C", "C++", "C#", "JavaScript", "TypeScript", "Swift", "SQL"],
+  "Web & Software Development": ["HTML", "CSS", "React", "Tailwind CSS", "Vite", "Node.js", "ASP.NET", "FastAPI", "REST APIs"],
+  Databases: ["MySQL", "PostgreSQL", "MS SQL Server", "MongoDB", "Supabase"],
+  "Machine Learning & AI": ["PyTorch", "scikit-learn", "NumPy", "giotto-tda", "Jupyter Notebook", "Explainable AI", "Deep Learning"],
+  "Cloud & DevOps": ["Vercel", "MongoDB Atlas"],
+  "Data & Automation Tools": ["Power BI", "MATLAB", "Power Automate", "Power Apps"],
+  "Developer Tools": ["Git", "GitHub", "Visual Studio Code", "Eclipse"],
 }
 
 const workExperience = [
   {
-    position: "IT Desktop Analyst Intern",
-    company: "KZValve",
-    dates: "September 2025 - Present",
+    position: "Software Developer Intern",
+    company: "Beavercreek Marketing",
+    dates: "Feb 2026 – Present",
     responsibilities: [
-      "Resolved 100+ hardware and software issues, accelerating ticket resolution speed by 35%.",
-      "Developed and automated engineering report workflows using Power Automate, SQL, and Power BI, enhancing data accuracy and streamlining reporting processes.",
-      "Deployed and configured Dell PowerStore storage systems, expanding capacity from 2TB to 22TB per server",
-      "Strengthened system security by remediating vulnerabilities with Rapid7, achieving a 31% reduction in risks. "
+      "Built and optimized automated video rendering pipelines using Node.js, improving scalability and reducing manual processing.",
+      "Developed full-stack tools for job submission and queue monitoring with JavaScript/React, streamlining content production workflows.",
+      "Refactored legacy systems with asynchronous processing, logging, and error handling, increasing reliability of render operations."
     ]
   },
   {
-    position: "IT/System Support Intern",
+    position: "IT Desktop Support Analyst Intern",
     company: "KZValve",
-    dates: "May 2025 - August 2024",
+    dates: "September 2025 - Feb 2026",
     responsibilities: [
-      "Delivered end-user support by diagnosing and resolving technical issues across computers, printers, and operating systems",
+      "Designed AI-powered automation solutions using Power Automate, Power Apps, Power BI, and MS SQL, reducing manual work by 40% and improving cross-team efficiency.",
+      "Automated report generation for 10000+ records weekly, speeding up insights and decision-making by 35%.",
+      "Built automated workflows to track data changes and errors, send real-time alerts, and reduce reporting time by 50%, improving operational visibility across teams."
+    ]
+  },
+  {
+    position: "IT System Support Intern",
+    company: "KZValve",
+    dates: "May 2025 - September 2025",
+    responsibilities: [
+      "Resolved 100+ hardware and software issues, improving ticket resolution speed by 35%.",
+      "Deployed and configured Dell PowerStore storage systems, expanding capacity from 2TB to 22TB per server and enabling scalable, high-speed data access across servers and virtual machines.",
+      "Strengthened system security by remediating vulnerabilities using Rapid7, reducing risk exposure by 31%.",
       "Supported IT infrastructure by managing user access with Adaxes and configuring VoIP systems.",
-      "Assisted with the setting up of physical PowerStore storage systems to enhance data storage capacity and access speed",
-      "Administered virtual machines using Hyper-V to enable test environments, automate software deployment, and monitor system performance. "
+      "Installed and deployed Windows 11 on laptops and desktop towers, ensuring proper drivers, system updates, and user readiness."
     ]
   },
   {
