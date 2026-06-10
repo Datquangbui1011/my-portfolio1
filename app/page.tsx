@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import SkillGlobe from "@/components/SkillGlobe"
 
 /* ------------------------------------------------------------------ */
@@ -269,6 +269,55 @@ function WindowChrome({ title }: { title: string }) {
   )
 }
 
+/** Cycles random characters at high speed, then resolves to the real word.
+ *  Plays on mount (optionally delayed) and replays on hover. */
+function ScrambleText({ text, startDelay = 0 }: { text: string; startDelay?: number }) {
+  const [display, setDisplay] = useState(text)
+  const rafRef = useRef<number | null>(null)
+  const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/<>-_\\[]{}=+*#"
+
+  const scramble = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplay(text)
+      return
+    }
+    const total = text.length
+    let iteration = 0
+    const step = () => {
+      const revealed = iteration / 14 // reveal one real char every ~7 frames (slower)
+      let out = ""
+      for (let i = 0; i < total; i++) {
+        out += i < revealed ? text[i] : CHARS[(Math.random() * CHARS.length) | 0]
+      }
+      setDisplay(out)
+      if (revealed < total) {
+        iteration++
+        rafRef.current = requestAnimationFrame(step)
+      } else {
+        setDisplay(text)
+        rafRef.current = null
+      }
+    }
+    step()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text])
+
+  useEffect(() => {
+    const t = setTimeout(scramble, startDelay)
+    return () => {
+      clearTimeout(t)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [scramble, startDelay])
+
+  return (
+    <span onMouseEnter={scramble} className="inline-block tabular-nums">
+      {display}
+    </span>
+  )
+}
+
 function SectionHeading({ cmd, comment }: { cmd: string; comment: string }) {
   return (
     <div className="mb-10">
@@ -370,7 +419,7 @@ export default function Portfolio() {
             <span className="text-term-text group-hover:text-term-green transition-colors">~/dat-bui</span>
           </a>
           <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
+            {navItems.map((item, i) => (
               <a
                 key={item}
                 href={`#${item}`}
@@ -380,7 +429,7 @@ export default function Portfolio() {
                     : "text-term-dim hover:text-term-text"
                 }`}
               >
-                {item}
+                <ScrambleText text={item} startDelay={900 + i * 110} />
               </a>
             ))}
           </div>
