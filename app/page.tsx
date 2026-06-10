@@ -1,107 +1,341 @@
 "use client"
 
 import type React from "react"
-import { ExternalLink, ArrowDownRight, ArrowUpRight, ArrowUp } from "lucide-react"
-import { motion, useScroll, useTransform, useSpring } from "framer-motion"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { useRef } from "react"
-import TechMarquee from "@/components/TechMarquee"
+import SkillGlobe from "@/components/SkillGlobe"
 
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
 
-const skills = {
-  "Programming Languages": ["Python", "Java", "C", "C++", "C#", "JavaScript", "TypeScript", "Swift", "SQL"],
-  "Web & Software Development": ["HTML", "CSS", "React", "Tailwind CSS", "Vite", "Node.js", "ASP.NET", "FastAPI", "REST APIs"],
-  "Databases": ["MySQL", "PostgreSQL", "MS SQL Server", "MongoDB", "Supabase"],
-  "Machine Learning & AI": ["PyTorch", "scikit-learn", "NumPy", "giotto-tda", "Jupyter Notebook", "Explainable AI", "Deep Learning"],
-  "Cloud & DevOps": ["Vercel", "MongoDB Atlas"],
-  "Data & Automation Tools": ["Power BI", "MATLAB", "Power Automate", "Power Apps"],
-  "Developer Tools": ["Git", "GitHub", "Visual Studio Code", "Eclipse"],
+const skills: Record<string, string[]> = {
+  languages: ["Python", "Java", "C", "C++", "C#", "JavaScript", "TypeScript", "Swift", "SQL"],
+  web: ["HTML", "CSS", "React", "Tailwind", "Vite", "Node.js", "ASP.NET", "FastAPI", "REST"],
+  databases: ["MySQL", "PostgreSQL", "MS SQL Server", "MongoDB", "Supabase"],
+  ml_ai: ["PyTorch", "scikit-learn", "NumPy", "giotto-tda", "Jupyter", "Explainable AI", "Deep Learning"],
+  cloud_devops: ["Vercel", "MongoDB Atlas", "Git", "GitHub", "Docker"],
+  data_tools: ["Power BI", "MATLAB", "Power Automate", "Power Apps"],
 }
 
 const workExperience = [
   {
+    hash: "b3e7d10",
+    branch: "beavercreek",
+    position: "Senior Software Engineering Intern",
+    company: "Beavercreek Marketing",
+    dates: "Jun 2026 – Present",
+    promoted: true,
+    responsibilities: [
+      "Rebuilt the distributed video rendering platform architecture using Cloudflare Workers and JavaScript — cutting rendering time by 40%, enabling dead-letter recovery, and scaling to 5,000+ msg/sec throughput.",
+      "Owned a multi-process Mac Mini render farm orchestrating After Effects and FFmpeg — eliminating race conditions across automated branded video pipelines for 3,000+ financial institutions.",
+      "Built an internal admin portal and B2B client portal with React, Cloudflare Workers AI caption integration, and real-time monitoring.",
+      "Mentored an incoming intern through codebase onboarding and contribution workflows.",
+    ],
+  },
+  {
+    hash: "a1f9c2e",
+    branch: "beavercreek",
     position: "Software Developer Intern",
     company: "Beavercreek Marketing",
-    dates: "Feb 2026 – Present",
+    dates: "Feb 2026 – Jun 2026",
     responsibilities: [
       "Built and optimized automated video rendering pipelines using Node.js.",
       "Developed full-stack tools for job submission and queue monitoring with JavaScript/React.",
-      "Refactored legacy systems with asynchronous processing, logging, and error handling."
-    ]
+      "Refactored legacy systems with asynchronous processing, logging, and error handling.",
+    ],
   },
   {
+    hash: "f5c1a93",
+    branch: "research",
+    position: "Undergraduate Researcher",
+    company: "UNL — School of Computing",
+    dates: "Oct 2025 – Present",
+    responsibilities: [
+      "Conducting research on Explainable AI using Topological Laplacians with PyTorch, giotto-tda, NumPy, scikit-learn, and Jupyter.",
+      "Built and evaluated deep learning pipelines on 3+ benchmark datasets, integrating persistent Laplacians and persistence-diagram vectorization to analyze latent feature representations.",
+      "Improving the transparency and interpretability of deep learning models through topological data analysis.",
+    ],
+  },
+  {
+    hash: "7d4b0aa",
+    branch: "kzvalve-it",
     position: "IT Desktop Support Analyst Intern",
     company: "KZValve",
-    dates: "September 2025 - Feb 2026",
+    dates: "Sep 2025 – Feb 2026",
+    promoted: true,
     responsibilities: [
-      "Designed AI-powered automation solutions using Power Automate, Power Apps, Power BI, and MS SQL.",
-      "Automated report generation for 10000+ records weekly.",
-      "Built automated workflows to track data changes and errors, send real-time alerts."
-    ]
+      "Designed AI-powered automation solutions using Power Automate, Power Apps, Power BI, and MS SQL, reducing manual work by 40% and improving cross-team efficiency.",
+      "Automated report generation for 10,000+ records weekly, speeding up insights and decision-making by 35%.",
+      "Built automated workflows to track data changes and errors, send real-time alerts, and reduce reporting time by 50%, improving operational visibility across teams.",
+    ],
   },
   {
+    hash: "3c8e15f",
+    branch: "kzvalve-sys",
     position: "IT System Support Intern",
     company: "KZValve",
-    dates: "May 2025 - September 2025",
+    dates: "May 2025 – Sep 2025",
     responsibilities: [
       "Resolved 100+ hardware and software issues, improving ticket resolution speed by 35%.",
-      "Deployed and configured Dell PowerStore storage systems, expanding capacity from 2TB to 22TB.",
-      "Strengthened system security by remediating vulnerabilities using Rapid7."
-    ]
+      "Deployed and configured Dell PowerStore storage systems, expanding capacity from 2TB to 22TB per server and enabling scalable, high-speed data access across servers and virtual machines.",
+      "Strengthened system security by remediating vulnerabilities using Rapid7, reducing risk exposure by 31%.",
+      "Supported IT infrastructure by managing user access with Adaxes and configuring VoIP systems.",
+      "Installed and deployed Windows 11 on laptops and desktop towers, ensuring proper drivers, system updates, and user readiness.",
+    ],
   },
   {
+    hash: "e02a9b1",
+    branch: "unl-soc",
     position: "Learning Assistant",
-    company: "UNL - School of Computing",
-    dates: "Jan 2025 - Present",
+    company: "UNL — School of Computing",
+    dates: "Jan 2025 – Present",
     responsibilities: [
-      "Provided individualized support to over 60 students through one-on-one sessions and CampusWire.",
-      "Evaluated and graded student assignments on CSE servers (Handin, Web-grader).",
-      "Oversaw computer lab sessions for 30+ students."
-    ]
-  }
-];
+      "Provided individualized support to 60+ students via one-on-one sessions and CampusWire.",
+      "Evaluated and graded assignments on CSE servers (Handin, Web-grader).",
+      "Oversaw computer lab sessions for 30+ students.",
+    ],
+  },
+  {
+    hash: "9a2d4c7",
+    branch: "nest",
+    position: "Learning Consultant",
+    company: "UNL — College of Engineering (NEST)",
+    dates: "Sep 2024 – May 2026",
+    responsibilities: [
+      "Tutored MATH courses — Calculus I/II/III, Linear Algebra, and Differential Equations — for the Nebraska Engineering Support and Tutoring (NEST) program.",
+      "Helped students strengthen problem-solving skills and conceptual understanding through one-on-one and group support.",
+    ],
+  },
+  {
+    hash: "1b8f602",
+    branch: "ets",
+    position: "Coding & Robotics Teaching Assistant",
+    company: "Educational Talent Search",
+    dates: "May 2024 – Jun 2024",
+    responsibilities: [
+      "Facilitated hands-on JavaScript programming and Sphero robotics learning for middle-school scholars.",
+      "Integrated JavaScript and Sphero Bolt technologies into curriculum activities for interactive, engaging sessions.",
+      "Helped students apply JavaScript coding and the Sphero app to explore robotics and programming concepts.",
+    ],
+  },
+]
 
 const projects = [
   {
+    title: "Foody",
+    file: "foody/",
+    image: "/foody.jpeg",
+    fit: "contain",
+    incoming: true,
+    description: "An upcoming food-discovery app — currently in active development. Stay tuned.",
+    technologies: ["React", "TypeScript", "Next.js"],
+    github: "https://github.com/Datquangbui1011",
+  },
+  {
     title: "E-Commerce Platform",
-    description: "A full-featured e-commerce platform with product management, cart functionality, and payment processing.",
-    technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Stripe"],
+    file: "ecommerce/",
     image: "/ecommerce.png",
-    github: "https://github.com/Datquangbui1011/CSCE-361"
+    description: "A full-featured e-commerce platform with product management, cart, and payment processing.",
+    technologies: ["React", "Next.js", "TypeScript", "Tailwind", "Stripe"],
+    github: "https://github.com/Datquangbui1011/CSCE-361",
   },
   {
     title: "Portfolio Website",
-    description: "A responsive portfolio website showcasing projects and skills with a modern design.",
-    technologies: ["Next.js", "React", "Tailwind CSS", "Framer Motion"],
+    file: "portfolio/",
     image: "/portfolio.png",
+    description: "A responsive portfolio site showcasing projects and skills with a modern design.",
+    technologies: ["Next.js", "React", "Tailwind", "Framer Motion"],
     github: "https://github.com/Datquangbui1011/Portfolio",
   },
   {
     title: "Sidequest",
-    description: "A web app for students to prepare for internships with small projects.",
+    file: "sidequest/",
+    image: "/sidequest.png",
+    description: "A web app for students to prep for internships through small, focused projects.",
     technologies: ["React", "TypeScript", "Tailwind", "FastAPI"],
     github: "https://github.com/Datquangbui1011/Cornhack-Project",
-    image: "/sidequest.png",
   },
   {
-    title: "DB CINEMA",
-    description: "A full-stack cinema ticketing platform with user authentication, movie booking, and payment processing.",
+    title: "DB Cinema",
+    file: "db-cinema/",
+    image: "/dbcinema.png",
+    description: "A full-stack cinema ticketing platform with auth, movie booking, and payments.",
     technologies: ["MongoDB", "Express", "React", "Node.js"],
     github: "https://github.com/Datquangbui1011/DB-cinema",
     demo: "https://db-cinema-n6zt.vercel.app/",
-    image: "/dbcinema.png",
-  }
+  },
 ]
 
-export default function Portfolio() {
-  const [activeSection, setActiveSection] = useState("hero");
-  const [availableDate, setAvailableDate] = useState("");
-  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+// Logos for the interactive skill globe (Simple Icons slugs).
+const skillLogos = [
+  { name: "Python", slug: "python" },
+  { name: "TypeScript", slug: "typescript" },
+  { name: "JavaScript", slug: "javascript" },
+  { name: "React", slug: "react" },
+  { name: "Next.js", slug: "nextdotjs" },
+  { name: "Node.js", slug: "nodedotjs" },
+  { name: "Tailwind CSS", slug: "tailwindcss" },
+  { name: "HTML5", slug: "html5" },
+  { name: "C++", slug: "cplusplus" },
+  { name: "Swift", slug: "swift" },
+  { name: "MySQL", slug: "mysql" },
+  { name: "PostgreSQL", slug: "postgresql" },
+  { name: "MongoDB", slug: "mongodb" },
+  { name: "Supabase", slug: "supabase" },
+  { name: "FastAPI", slug: "fastapi" },
+  { name: "PyTorch", slug: "pytorch" },
+  { name: "scikit-learn", slug: "scikitlearn" },
+  { name: "NumPy", slug: "numpy" },
+  { name: "Jupyter", slug: "jupyter" },
+  { name: "Git", slug: "git" },
+  { name: "GitHub", slug: "github" },
+  { name: "Docker", slug: "docker" },
+  { name: "Vercel", slug: "vercel" },
+  { name: "Linux", slug: "linux" },
+]
 
-  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    setFormStatus("sending");
+const navItems = ["home", "about", "skills", "experience", "projects", "contact"]
+
+/* ------------------------------------------------------------------ */
+/*  Boot sequence (typed)                                              */
+/* ------------------------------------------------------------------ */
+
+const bootLines: { text: string; className?: string; delay?: number }[] = [
+  { text: "$ ssh dat@portfolio.dev", className: "text-term-text" },
+  { text: "Connecting to portfolio.dev:22 ...", className: "text-term-dim" },
+  { text: "Authenticating public key ............ [ OK ]", className: "text-term-dim" },
+  { text: "Loading kernel modules ............... [ OK ]", className: "text-term-dim" },
+  { text: "SYSTEM.KERNEL :: v4.8.0 ONLINE", className: "text-term-green term-glow" },
+  { text: "", },
+  { text: "> role    : Full-Stack Software Engineer", className: "text-term-text" },
+  { text: "> status  : available for work", className: "text-term-text" },
+  { text: "> loc     : Lincoln, NE", className: "text-term-text" },
+  { text: "> while (alive) { code(); learn(); ship(); }", className: "text-term-cyan" },
+]
+
+function useTypedLines(lines: typeof bootLines, charSpeed = 14, lineGap = 120) {
+  const [done, setDone] = useState<string[]>([])
+  const [current, setCurrent] = useState("")
+  const [finished, setFinished] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    let lineIdx = 0
+    let charIdx = 0
+
+    const tick = () => {
+      if (cancelled) return
+      if (lineIdx >= lines.length) {
+        setFinished(true)
+        return
+      }
+      const full = lines[lineIdx].text
+      if (charIdx <= full.length) {
+        setCurrent(full.slice(0, charIdx))
+        charIdx++
+        setTimeout(tick, full.length === 0 ? 60 : charSpeed)
+      } else {
+        setDone((d) => [...d, full])
+        setCurrent("")
+        lineIdx++
+        charIdx = 0
+        setTimeout(tick, lineGap)
+      }
+    }
+    const start = setTimeout(tick, 400)
+    return () => {
+      cancelled = true
+      clearTimeout(start)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return { done, current, finished }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Small primitives                                                   */
+/* ------------------------------------------------------------------ */
+
+function WindowChrome({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-term-border bg-term-panel/80">
+      <span className="w-3 h-3 rounded-full bg-term-red/80" />
+      <span className="w-3 h-3 rounded-full bg-term-amber/80" />
+      <span className="w-3 h-3 rounded-full bg-term-green/80" />
+      <span className="ml-3 text-xs text-term-dim tracking-wide">{title}</span>
+    </div>
+  )
+}
+
+function SectionHeading({ cmd, comment }: { cmd: string; comment: string }) {
+  return (
+    <div className="mb-10">
+      <div className="text-term-dim text-sm">
+        <span className="text-term-green">dat@portfolio</span>
+        <span className="text-term-dim">:</span>
+        <span className="text-term-cyan">~</span>
+        <span className="text-term-dim">$ </span>
+        <span className="text-term-text">{cmd}</span>
+      </div>
+      <p className="mt-2 text-term-dim text-sm">{`// ${comment}`}</p>
+    </div>
+  )
+}
+
+const reveal = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
+/* ------------------------------------------------------------------ */
+
+export default function Portfolio() {
+  const [active, setActive] = useState("home")
+  const [clock, setClock] = useState("")
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
+  const { done, current, finished } = useTypedLines(bootLines)
+
+  // live clock in the status bar
+  useEffect(() => {
+    const t = setInterval(() => {
+      setClock(
+        new Date().toLocaleTimeString("en-US", { hour12: false }) +
+          " UTC" +
+          (-new Date().getTimezoneOffset() / 60 >= 0 ? "+" : "") +
+          -new Date().getTimezoneOffset() / 60,
+      )
+    }, 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  // active section tracking
+  useEffect(() => {
+    const onScroll = () => {
+      for (const id of navItems) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        if (r.top <= window.innerHeight / 2 && r.bottom >= window.innerHeight / 2) {
+          setActive(id)
+          break
+        }
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    setFormStatus("sending")
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -111,369 +345,329 @@ export default function Portfolio() {
           company: (form.elements.namedItem("company") as HTMLInputElement).value,
           note: (form.elements.namedItem("note") as HTMLTextAreaElement).value,
         }),
-      });
+      })
       if (res.ok) {
-        setFormStatus("sent");
-        form.reset();
-        setTimeout(() => setFormStatus("idle"), 3000);
+        setFormStatus("sent")
+        form.reset()
+        setTimeout(() => setFormStatus("idle"), 3000)
       } else {
-        setFormStatus("error");
-        setTimeout(() => setFormStatus("idle"), 3000);
+        setFormStatus("error")
+        setTimeout(() => setFormStatus("idle"), 3000)
       }
     } catch {
-      setFormStatus("error");
-      setTimeout(() => setFormStatus("idle"), 3000);
+      setFormStatus("error")
+      setTimeout(() => setFormStatus("idle"), 3000)
     }
-  };
-
-  const { scrollY, scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 500], [0, -150]);
-
-  // Smooth top scroll-progress indicator
-  const progressScaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
-
-  const experienceRef = useRef<HTMLElement>(null);
-
-  const worksRef = useRef<HTMLDivElement>(null);
-  const [activeProject, setActiveProject] = useState(0);
-
-  const aboutRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: aboutScrollProgress } = useScroll({
-    target: aboutRef,
-    offset: ["start start", "end start"]
-  });
-  // As user scrolls DOWN past the section: full size → narrow + rounded + slide up
-  const aboutScale = useTransform(aboutScrollProgress, [0, 1], [1, 0.85]);
-  const aboutBorderRadius = useTransform(aboutScrollProgress, [0, 1], [0, 60]);
-  const aboutY = useTransform(aboutScrollProgress, [0, 1], [0, -80]);
-
-  useEffect(() => {
-    // Generate current dynamic date: e.g. "MAR'26"
-    const date = new Date();
-    const month = date.toLocaleString('default', { month: 'short' }).toUpperCase();
-    const year = date.getFullYear().toString().slice(-2);
-    setAvailableDate(`${month}'${year}`);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["hero", "experience", "works", "about", "contact"];
-      
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
-    };
-    
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const getNavColor = () => {
-    if (["experience", "works", "about", "contact"].includes(activeSection)) return "text-white";
-    return "text-dark";
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-beige font-sans selection:bg-gold selection:text-dark transition-colors duration-700">
-      {/* Scroll progress bar */}
-      <motion.div
-        style={{ scaleX: progressScaleX }}
-        className="fixed top-0 left-0 right-0 h-[3px] bg-gold z-[60] origin-left"
-      />
-
-      {/* Navigation */}
-      <motion.nav
-        style={{ opacity: heroOpacity, y: heroY }}
-        className={`fixed top-0 left-0 right-0 z-50 py-6 px-6 md:px-12 flex justify-between items-center transition-colors duration-500 ${getNavColor()}`}
-      >
-        <div className="overflow-hidden">
-          <motion.a
-            href="#hero"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-2 text-sm md:text-lg font-medium tracking-tight group"
-          >
-            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-            <span className="group-hover:text-gold transition-colors">Full-Stack Software Engineer</span>
-          </motion.a>
-        </div>
-        <div className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-bold overflow-hidden">
-          {["experience", "works", "about", "contact"].map((item, i) => (
-            <div key={item} className="overflow-hidden">
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.7, delay: 0.9 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <a href={`#${item}`} className="relative capitalize transition-colors hover:text-gold">
-                  {item}
-                  <span
-                    className={`absolute -bottom-1.5 left-0 h-[2px] bg-gold transition-all duration-300 ${activeSection === item ? "w-full" : "w-0"}`}
-                  />
-                </a>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-      </motion.nav>
-
-{/* Hero Section */}
-<motion.section
-  id="hero"
-  style={{ opacity: heroOpacity, y: heroY }}
-  className="grain bg-beige min-h-screen flex flex-col justify-between relative pt-24 pb-12 px-6 md:px-12 overflow-hidden text-dark"
->
-  {/* Animated aurora backdrop */}
-  <div className="absolute inset-0 -z-0 pointer-events-none overflow-hidden">
-    <div className="aurora-blob absolute -top-1/4 -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gold/25 blur-[120px]" />
-    <div className="aurora-blob absolute top-1/3 right-[-10%] w-[45vw] h-[45vw] rounded-full bg-olive/30 blur-[130px]" style={{ animationDelay: "-6s" }} />
-    <div className="aurora-blob absolute bottom-[-15%] left-1/4 w-[40vw] h-[40vw] rounded-full bg-gold-soft/20 blur-[110px]" style={{ animationDelay: "-12s" }} />
-  </div>
-
-  {/* BIG NAME — masked slide-up reveal */}
-  <div className="relative z-10 w-full overflow-hidden">
-    <motion.div
-      initial={{ y: '100%' }}
-      animate={{ y: 0 }}
-      transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap');`}</style>
-      <h1
-        style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(1rem, 14.5vw, 19rem)", lineHeight: 0.9, letterSpacing: "-0.01em" }}
-        className="font-bold text-dark whitespace-nowrap w-full"
-      >
-        DAT BUI
-      </h1>
-    </motion.div>
-  </div>
-
-  {/* Bottom 3-col layout */}
-  <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-12 mt-8">
-    {/* Left — description + CTA */}
-    <div className="flex flex-col gap-6 max-w-xs">
-      <div className="overflow-hidden">
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <ArrowDownRight className="w-10 h-10 text-dark/40" />
-        </motion.div>
-      </div>
-      <div className="overflow-hidden">
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <p className="text-lg leading-relaxed text-dark/80 font-medium tracking-tight">
-            I build fast, modern applications that help businesses grow, available for work worldwide.
-          </p>
-        </motion.div>
-      </div>
-      <div className="overflow-hidden">
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <a href="#contact" className="inline-flex items-center gap-2 bg-dark text-beige px-6 py-3 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform w-fit">
-            CONTACT <ExternalLink className="w-4 h-4" />
+    <div className="scanlines min-h-dvh bg-term-bg text-term-text selection:bg-term-green/30 selection:text-term-bright">
+      {/* ---------------- Top nav ---------------- */}
+      <nav className="fixed top-0 inset-x-0 z-50 border-b border-term-border bg-term-bg/90 backdrop-blur-sm">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 h-12 flex items-center justify-between text-sm">
+          <a href="#home" className="flex items-center gap-2 group">
+            <span className="text-term-green term-glow">●</span>
+            <span className="text-term-text group-hover:text-term-green transition-colors">~/dat-bui</span>
           </a>
-        </motion.div>
-      </div>
-    </div>
-
-    {/* Center — photo */}
-    <div className="flex justify-center overflow-hidden">
-      <motion.div
-        initial={{ y: '100%', opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div className="w-48 h-60 md:w-72 md:h-[22rem] relative overflow-hidden grayscale contrast-125 hover:grayscale-0 transition-all duration-700 rounded-lg flex-shrink-0">
-          <img src="/Dat.jpeg" alt="Dat Bui" className="w-full h-full object-cover" />
-        </div>
-      </motion.div>
-    </div>
-
-    {/* Right — available for work */}
-    <div className="text-right">
-      <div className="overflow-hidden">
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.7, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="flex items-center justify-end gap-2 text-xs font-bold uppercase tracking-[0.2em] text-dark/60 mb-1">
-            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" /> Available for work
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => (
+              <a
+                key={item}
+                href={`#${item}`}
+                className={`px-3 py-1 rounded transition-colors ${
+                  active === item
+                    ? "text-term-green bg-term-green/10"
+                    : "text-term-dim hover:text-term-text"
+                }`}
+              >
+                {item}
+              </a>
+            ))}
           </div>
-        </motion.div>
-      </div>
-      <div className="overflow-hidden">
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="text-5xl md:text-6xl font-black tracking-tight">
-            {availableDate.split("'")[0]}
-            <span className="text-gold">'{availableDate.split("'")[1]}</span>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  </div>
-
-  {/* Scroll cue */}
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ delay: 1.6, duration: 1 }}
-    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2"
-  >
-    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-dark/40">Scroll</span>
-    <div className="w-[1px] h-12 bg-dark/20 overflow-hidden">
-      <motion.div
-        animate={{ y: ["-100%", "100%"] }}
-        transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-        className="w-full h-1/2 bg-gold"
-      />
-    </div>
-  </motion.div>
-</motion.section>
-
-{/* Tech marquee — animated logo strip */}
-<TechMarquee />
-
-      {/* Experience Section */}
-      <section 
-        id="experience" 
-        className="bg-dark text-beige relative transition-colors duration-700"
-      >
-        {/* Sticky Header */}
-        <div className="sticky top-0 px-6 md:px-12 pt-24 md:pt-32 pb-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8 z-0 bg-dark w-full border-b border-beige/10">
-          <h2 className="text-4xl md:text-6xl font-black shrink-0 tracking-tighter">EXPERIENCE <span className="text-gold">/</span></h2>
-          <p className="max-w-md text-lg md:text-xl leading-relaxed font-medium text-beige/80 tracking-tight">
-            {/* A background in technical support, software engineering, and teaching, blending problem solving with practical application. */}
-          </p>
+          <a
+            href="#contact"
+            className="md:hidden text-term-green border border-term-green/40 px-3 py-1 rounded"
+          >
+            contact
+          </a>
         </div>
-        
-        {/* Pinned Cards Container */}
-        <div className="relative pb-32">
-          {workExperience.slice(0, 4).map((exp, i) => (
-            <div 
-              key={i} 
-              // Each card is sticky and takes up the full screen height
-              // The top padding offsets the card below the sticky header (approx header height)
-              className="sticky top-[20vh] md:top-[25vh] w-full flex items-start justify-center bg-dark min-h-[80vh] md:min-h-[75vh]"
-              style={{ zIndex: i + 10 }}
-            >
-              <div className="w-full max-w-7xl mx-auto px-6 md:px-12 border-t border-beige/20 pt-8 md:pt-16 bg-dark shadow-[-10px_-20px_40px_rgba(0,0,0,0.5)]">
-                <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start pb-24">
-                  
-                  {/* Big Number */}
-                  <div className="text-6xl md:text-[8rem] font-medium font-mono leading-none flex-shrink-0">
-                    <span className="text-beige/20">0</span><span className="text-gold">{i+1}</span>
+      </nav>
+
+      {/* ---------------- Hero / boot ---------------- */}
+      <section
+        id="home"
+        className="term-grid term-flicker min-h-dvh flex items-center px-4 md:px-6 pt-12"
+      >
+        <div className="max-w-5xl mx-auto w-full">
+          <div className="rounded-lg border border-term-border bg-term-panel/40 shadow-[0_0_60px_rgba(77,155,255,0.07)] overflow-hidden">
+            <WindowChrome title="dat@portfolio: ~ — zsh — 96×32" />
+            <div className="p-5 md:p-8 text-sm md:text-[15px] leading-relaxed min-h-[60vh]">
+              {done.map((line, i) => (
+                <pre key={i} className={`whitespace-pre-wrap break-words ${bootLines[i]?.className ?? "text-term-text"}`}>
+                  {line || " "}
+                </pre>
+              ))}
+              {!finished && (
+                <pre className={`whitespace-pre-wrap break-words ${bootLines[done.length]?.className ?? "text-term-text"}`}>
+                  {current}
+                  <span className="term-cursor" />
+                </pre>
+              )}
+
+              {finished && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mt-8"
+                >
+                  <pre className="text-term-green term-glow text-[10px] sm:text-sm md:text-base leading-tight overflow-x-auto">
+{String.raw` ____    _  _____   ____  _   _ ___
+|  _ \  / \|_   _| | __ )| | | |_ _|
+| | | |/ _ \ | |   |  _ \| | | || |
+| |_| / ___ \| |   | |_) | |_| || |
+|____/_/   \_\_|   |____/ \___/|___|`}
+                  </pre>
+                  <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                    <a
+                      href="#projects"
+                      className="inline-flex items-center gap-2 bg-term-green text-term-bg px-4 py-2 rounded font-semibold hover:bg-term-bright transition-colors"
+                    >
+                      ./view-projects.sh
+                    </a>
+                    <a
+                      href="#contact"
+                      className="inline-flex items-center gap-2 border border-term-green/40 text-term-green px-4 py-2 rounded hover:bg-term-green/10 transition-colors"
+                    >
+                      ./say-hi <span className="term-cursor !h-[0.9em]" />
+                    </a>
                   </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 flex flex-col justify-start w-full">
-                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
-                      <h3 className="text-3xl md:text-5xl font-bold tracking-tighter text-beige leading-tight">{exp.position}</h3>
-                      <p className="text-lg md:text-xl font-medium tracking-tight text-beige/80 whitespace-nowrap bg-beige/10 px-4 py-2 rounded-full">{exp.company}</p>
-                    </div>
-                    
-                    <div className="space-y-6">
-                      <p className="text-base md:text-lg font-medium text-beige/60 tracking-tight mb-8 font-mono">{exp.dates}</p>
-                      <span className="text-sm font-bold uppercase tracking-widest text-beige/40">Responsibilities</span>
-                      <ul className="space-y-4 max-w-2xl mt-4">
-                        {exp.responsibilities.map((r,idx) => (
-                          <li key={idx} className="text-base md:text-lg text-beige/80 flex items-start gap-4">
-                            <div className="w-2 h-2 rounded-full bg-beige mt-2.5 flex-shrink-0" />
-                            <span className="leading-relaxed font-medium">{r}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </motion.div>
+              )}
             </div>
-          ))}
+          </div>
+          <p className="mt-3 text-xs text-term-dim text-center">
+            tip: use the nav above or scroll to walk the filesystem ↓
+          </p>
         </div>
       </section>
 
-      {/* Works Section */}
-      <section id="works" className="bg-dark text-beige pt-32 pb-16 transition-colors duration-700">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 px-6 md:px-12 md:border-b border-beige/10 pb-12 gap-4 max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter">SELECTED WORKS <span className="text-gold">/</span></h2>
-          <span className="uppercase text-sm font-bold tracking-[0.2em] text-beige/50">({projects.length.toString().padStart(2, "0")} PROJECTS)</span>
-        </div>
-        
-        <div ref={worksRef} className="flex flex-col md:flex-row relative max-w-7xl mx-auto px-6 md:px-12">
-          
-          {/* Left Column: Sticky Number Odometer */}
-          <div className="hidden md:flex w-1/3 sticky top-0 h-screen items-center overflow-hidden">
-            <div className="text-[12rem] lg:text-[18rem] font-medium font-mono leading-none tracking-tighter flex items-start h-[12rem] lg:h-[18rem] overflow-hidden text-beige -ml-4">
-              <span className="h-full flex items-center justify-center text-beige/25">0</span>
-              <motion.div
-                animate={{ y: `-${activeProject * (100 / projects.length)}%` }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col"
-              >
-                {projects.map((_, i) => (
-                  <span key={i} className="h-[12rem] lg:h-[18rem] flex items-center justify-center flex-shrink-0">
-                    {i + 1}
-                  </span>
-                ))}
-              </motion.div>
+      {/* ---------------- about.system ---------------- */}
+      <section id="about" className="px-4 md:px-6 py-24 border-t border-term-border">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading cmd="cat about.system" comment="who is running this process" />
+          <motion.div {...reveal} className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="md:col-span-2 space-y-5 text-term-text/90 leading-relaxed">
+              <p>
+                <span className="text-term-green">const</span> me ={" "}
+                <span className="text-term-amber">"Dat Bui"</span> — a Junior at the University of
+                Nebraska–Lincoln pursuing a B.S. in Computer Science with a minor in Mathematics.
+              </p>
+              <p>
+                I grew up in Bien Hoa, Vietnam, and have lived in Lincoln for 4 years. My background
+                spans customer service, teaching, and IT — and has since converged on software
+                engineering.
+              </p>
+              <p>
+                I build fast, modern applications, automate the boring parts, and I&apos;m always
+                shipping something new. Always eager to gain hands-on experience across computing.
+              </p>
             </div>
-          </div>
-
-          {/* Right Column: Scrolling Projects */}
-          <div className="w-full md:w-2/3 flex flex-col py-12 md:py-32 gap-32">
-            {projects.map((proj, i) => (
-              <motion.div 
-                key={i} 
-                onViewportEnter={() => setActiveProject(i)}
-                viewport={{ margin: "-45% 0px -45% 0px", amount: 0 }}
-                className="flex flex-col gap-8 md:gap-12 group"
-              >
-                {/* Mobile number display */}
-                <div className="md:hidden text-6xl font-medium text-beige/20 font-mono mb-4">0{i+1}</div>
-                
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-beige/10 group-hover:border-gold/40 bg-dark group-hover:shadow-[0_0_60px_rgba(216,166,78,0.18)] transition-all duration-700">
-                  <div className="absolute inset-0 bg-dark/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                  <img src={proj.image} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 origin-center" />
-                  
-                  <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 md:gap-6 z-20 backdrop-blur-sm">
-                    {proj.demo && (
-                      <a href={proj.demo} target="_blank" rel="noreferrer" className="bg-beige text-dark px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:scale-105 transition-transform text-sm md:text-base tracking-widest uppercase shadow-lg">
-                        View Demo
-                      </a>
-                    )}
-                    <a href={proj.github} target="_blank" rel="noreferrer" className="bg-beige text-dark px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:scale-105 transition-transform text-sm md:text-base tracking-widest uppercase shadow-lg">
-                      Source
-                    </a>
+            <div className="space-y-5">
+              {/* photo viewer */}
+              <div className="group rounded-lg border border-term-border bg-term-panel/50 overflow-hidden hover:border-term-green/40 transition-colors">
+                <div className="flex items-center justify-between px-3 py-2 border-b border-term-border text-xs">
+                  <span className="text-term-dim">
+                    <span className="text-term-green">$</span> open ~/dat.png
+                  </span>
+                  <span className="text-term-dim">1.2MB</span>
+                </div>
+                <div className="relative aspect-[4/5] overflow-hidden">
+                  <img
+                    src="/Dat.png"
+                    alt="Dat Bui"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-2 left-3 text-xs text-term-green term-glow">
+                    ~/dat-bui <span className="term-cursor !h-[0.85em]" />
                   </div>
                 </div>
-                
-                <div>
-                  <h3 className="text-3xl md:text-5xl font-bold mb-4 tracking-tighter transition-colors group-hover:text-gold">{proj.title}</h3>
-                  <p className="text-beige/60 mb-8 text-lg leading-relaxed font-medium">{proj.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {proj.technologies.map(t => (
-                      <span key={t} className="text-xs font-bold uppercase tracking-widest border border-beige/20 px-3 py-1.5 rounded-full text-beige/80 hover:border-gold/60 hover:text-gold transition-colors">{t}</span>
+              </div>
+
+              {/* quick stats */}
+              <div className="rounded-lg border border-term-border bg-term-panel/50 p-5 text-sm">
+                <div className="text-term-dim mb-3">// quick stats</div>
+                <ul className="space-y-2">
+                  <li className="flex justify-between"><span className="text-term-dim">uptime</span><span className="text-term-text">3+ yrs in Lincoln</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">focus</span><span className="text-term-green">full-stack</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">edu</span><span className="text-term-text">CS @ UNL</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">minor</span><span className="text-term-text">Mathematics</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">status</span><span className="text-term-bright term-glow">● open</span></li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ---------------- skills.json ---------------- */}
+      <section id="skills" className="px-4 md:px-6 py-24 border-t border-term-border">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading cmd="./render skills.globe --interactive" comment="drag to explore the stack" />
+          <motion.div
+            {...reveal}
+            className="rounded-lg border border-term-border bg-term-panel/40 overflow-hidden term-grid"
+          >
+            <WindowChrome title="skills.globe — drag to rotate · hover to inspect" />
+            <div className="relative px-2 py-6 md:py-10">
+              <SkillGlobe skills={skillLogos} />
+              <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[11px] text-term-dim flex items-center gap-2">
+                <span className="text-term-green">$</span> drag to spin · hover a node
+                <span className="term-cursor !h-[0.8em]" />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* full categorized list */}
+          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+            {Object.entries(skills).map(([key, list]) => (
+              <motion.div key={key} {...reveal}>
+                <div className="text-xs text-term-cyan mb-2">
+                  <span className="text-term-dim">&quot;</span>
+                  {key}
+                  <span className="text-term-dim">&quot;:</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {list.map((s) => (
+                    <span
+                      key={s}
+                      className="text-xs text-term-text/80 border border-term-border rounded px-2 py-0.5 hover:border-term-green/40 hover:text-term-green transition-colors"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- experience (git log) ---------------- */}
+      <section id="experience" className="px-4 md:px-6 py-24 border-t border-term-border">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading cmd="git log --oneline --career" comment="commit history of the journey" />
+          <div className="relative">
+            {/* vertical line */}
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-term-border md:left-[7px]" />
+            <div className="space-y-10">
+              {workExperience.map((exp) => (
+                <motion.div key={exp.hash} {...reveal} className="relative pl-8">
+                  <span className="absolute left-0 top-1.5 w-[15px] h-[15px] rounded-full border-2 border-term-green bg-term-bg" />
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-term-amber">{exp.hash}</span>
+                    <span className="text-term-dim">(</span>
+                    <span className="text-term-cyan">{exp.branch}</span>
+                    <span className="text-term-dim">)</span>
+                    <span className="text-term-text font-semibold">{exp.position}</span>
+                    {"promoted" in exp && exp.promoted && (
+                      <span className="text-[10px] uppercase tracking-wider text-term-green border border-term-green/40 bg-term-green/10 rounded px-1.5 py-0.5">
+                        ↑ promoted
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 text-sm text-term-dim">
+                    @ {exp.company} · <span className="text-term-green">{exp.dates}</span>
+                  </div>
+                  <ul className="mt-3 space-y-1.5 text-sm text-term-text/85">
+                    {exp.responsibilities.map((r, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-term-green select-none">+</span>
+                        <span>{r}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- projects ---------------- */}
+      <section id="projects" className="px-4 md:px-6 py-24 border-t border-term-border">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading cmd="ls -la ~/projects" comment="selected works" />
+          <div className="grid sm:grid-cols-2 gap-5">
+            {projects.map((proj) => (
+              <motion.div
+                {...reveal}
+                key={proj.title}
+                className="group rounded-lg border border-term-border bg-term-panel/50 overflow-hidden hover:border-term-green/40 hover:shadow-[0_0_40px_rgba(77,155,255,0.1)] transition-all"
+              >
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-term-border text-xs">
+                  <span className="text-term-dim">
+                    <span className="text-term-green">drwxr-xr-x</span> {proj.file}
+                  </span>
+                  <div className="flex gap-3">
+                    {"incoming" in proj && proj.incoming ? (
+                      <span className="text-term-amber">[wip · coming soon]</span>
+                    ) : (
+                      <>
+                        <a
+                          href={proj.github}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-term-dim hover:text-term-green transition-colors"
+                        >
+                          [source]
+                        </a>
+                        {proj.demo && (
+                          <a
+                            href={proj.demo}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-term-cyan hover:text-term-bright transition-colors"
+                          >
+                            [live]
+                          </a>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+                {/* screenshot preview */}
+                <div className="relative aspect-[16/10] overflow-hidden border-b border-term-border bg-term-bg term-grid">
+                  <img
+                    src={proj.image}
+                    alt={`${proj.title} screenshot`}
+                    loading="lazy"
+                    className={`w-full h-full transition-transform duration-700 group-hover:scale-105 ${
+                      "fit" in proj && proj.fit === "contain"
+                        ? "object-contain object-center p-3"
+                        : "object-cover object-top"
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-term-panel/60 to-transparent pointer-events-none" />
+                  {"incoming" in proj && proj.incoming && (
+                    <span className="absolute top-2 right-2 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-term-bg bg-term-amber font-semibold rounded px-2 py-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-term-bg animate-pulse" /> incoming
+                    </span>
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-term-text group-hover:text-term-green transition-colors">
+                    {proj.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-term-text/75 leading-relaxed">{proj.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {proj.technologies.map((t) => (
+                      <span
+                        key={t}
+                        className="text-xs text-term-cyan border border-term-border rounded px-2 py-0.5 group-hover:border-term-green/30 transition-colors"
+                      >
+                        {t}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -483,121 +677,102 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* About & Skills Section */}
-      <section id="about" className="relative z-10">
-        <motion.div 
-          ref={aboutRef}
-          style={{ scale: aboutScale, borderRadius: aboutBorderRadius, y: aboutY }}
-          className="grain bg-olive text-beige py-32 px-6 md:px-12 origin-top overflow-hidden"
-        >
-          <div className="grid md:grid-cols-2 gap-24 max-w-7xl mx-auto">
-            <div>
-              <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter">ABOUT ME <span className="text-gold">/</span></h2>
-              <div className="space-y-8 text-xl md:text-2xl leading-relaxed text-beige/80 font-medium tracking-tight">
-                <p>I'm a Junior student at the University of Nebraska–Lincoln, pursuing a bachelor's degree in Computer Science with a minor in Mathematics.</p>
-                <p>I grew up in Bien Hoa, Vietnam, and have lived in Lincoln for 4 years.</p>
-                <p>I have a diverse work background, starting in food customer service, teaching assistant, IT experience and transitioning into software development. I'm passionate about software engineering and eager to continue gaining hands-on experience across different areas of computing.</p>
-              </div>
-            </div>
-            <div>
-              <h2 className="text-3xl md:text-4xl font-black mb-12 tracking-tighter">TECHNICAL SKILLS</h2>
-              <div className="space-y-12">
-                {Object.entries(skills).map(([category, list]) => (
-                  <div key={category}>
-                    <h3 className="uppercase font-bold tracking-[0.2em] text-sm text-beige/50 mb-6">{category}</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {list.map(s => (
-                        <span key={s} className="bg-beige/10 px-4 py-2 text-sm font-medium rounded-md hover:bg-gold hover:text-dark transition-colors cursor-default">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Contact & Footer Section */}
-      <section id="contact" className="grain bg-dark text-beige py-24 px-6 md:px-12 relative overflow-hidden">
-        {/* soft gold glow */}
-        <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[60vw] h-[40vw] rounded-full bg-gold/10 blur-[140px] pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row gap-16 md:gap-24 mb-24">
-            {/* Left: Heading */}
-            <div className="md:w-1/2 flex flex-col justify-center">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-6 border border-beige/20 px-4 py-1.5 rounded-full w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" /> Got a project?
-              </div>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">LET'S WORK<br/><span className="text-gold">TOGETHER</span></h2>
-              <a href="mailto:quangdatbui10112004@gmail.com" className="text-beige/60 hover:text-gold transition-colors font-medium text-lg flex items-center gap-2 group w-fit">
-                quangdatbui10112004@gmail.com
-                <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"/>
-              </a>
-            </div>
-
-            {/* Right: Form */}
-            <div className="md:w-1/2">
-              <form className="flex flex-col gap-6" onSubmit={handleContactSubmit}>
-                <div>
-                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Name</label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    placeholder="Your name"
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Company</label>
-                  <input
-                    id="company"
-                    name="company"
-                    type="text"
-                    placeholder="Your company"
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="note" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Note</label>
-                  <textarea
-                    id="note"
-                    name="note"
-                    rows={4}
-                    required
-                    placeholder="Tell me about your project..."
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors resize-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={formStatus === "sending" || formStatus === "sent"}
-                  className="mt-4 bg-beige text-dark px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-gold hover:scale-105 transition-all w-fit self-start disabled:opacity-70 disabled:hover:scale-100"
+      {/* ---------------- contact.exe ---------------- */}
+      <section id="contact" className="px-4 md:px-6 py-24 border-t border-term-border">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading cmd="./contact.exe --open-channel" comment="establish a secure connection" />
+          <div className="grid md:grid-cols-2 gap-10">
+            <motion.div {...reveal} className="space-y-5">
+              <p className="text-2xl font-semibold text-term-text">
+                Let&apos;s build something. <span className="term-cursor align-middle" />
+              </p>
+              <p className="text-term-text/75 leading-relaxed">
+                Open to internships, full-time roles, and collaborations. Drop a message — I usually
+                reply within a day.
+              </p>
+              <div className="space-y-2 text-sm pt-2">
+                <a
+                  href="mailto:quangdatbui10112004@gmail.com"
+                  className="flex items-center gap-3 text-term-dim hover:text-term-green transition-colors"
                 >
-                  {formStatus === "sending" && "Sending..."}
-                  {formStatus === "sent" && "✓ Sent!"}
-                  {formStatus === "error" && "Failed — Try Again"}
-                  {formStatus === "idle" && "Send Message"}
-                </button>
-              </form>
-            </div>
-          </div>
+                  <span className="text-term-green">$</span> mail quangdatbui10112004@gmail.com
+                </a>
+                <a
+                  href="https://github.com/Datquangbui1011"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 text-term-dim hover:text-term-green transition-colors"
+                >
+                  <span className="text-term-green">$</span> open github.com/Datquangbui1011
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/datbui1011/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 text-term-dim hover:text-term-green transition-colors"
+                >
+                  <span className="text-term-green">$</span> open linkedin.com/in/datbui1011
+                </a>
+              </div>
+            </motion.div>
 
-          {/* Footer */}
-          <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-beige/10 pt-12 text-beige/50 text-sm font-bold tracking-widest gap-8">
-            <div className="flex gap-8">
-              <a href="https://github.com/Datquangbui1011" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">GITHUB</a>
-              <a href="https://www.linkedin.com/in/datbui1011/" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">LINKEDIN</a>
-            </div>
-            <div>© {new Date().getFullYear()} DAT BUI</div>
-            <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="hover:text-gold transition-colors flex items-center gap-2">
-              BACK TO TOP <ArrowUp className="w-4 h-4"/>
-            </button>
+            <motion.form {...reveal} onSubmit={handleSubmit} className="space-y-4">
+              {[
+                { id: "name", label: "name", type: "text", required: true, placeholder: "your name" },
+                { id: "company", label: "company", type: "text", required: false, placeholder: "optional" },
+              ].map((f) => (
+                <div key={f.id}>
+                  <label htmlFor={f.id} className="block text-xs text-term-dim mb-1">
+                    <span className="text-term-green">const</span> {f.label} =
+                  </label>
+                  <input
+                    id={f.id}
+                    name={f.id}
+                    type={f.type}
+                    required={f.required}
+                    placeholder={f.placeholder}
+                    className="w-full bg-term-bg border border-term-border rounded px-3 py-2 text-sm text-term-text placeholder:text-term-dim focus:outline-none focus:border-term-green transition-colors"
+                  />
+                </div>
+              ))}
+              <div>
+                <label htmlFor="note" className="block text-xs text-term-dim mb-1">
+                  <span className="text-term-green">const</span> message =
+                </label>
+                <textarea
+                  id="note"
+                  name="note"
+                  rows={4}
+                  required
+                  placeholder="tell me about your project..."
+                  className="w-full bg-term-bg border border-term-border rounded px-3 py-2 text-sm text-term-text placeholder:text-term-dim focus:outline-none focus:border-term-green transition-colors resize-none"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={formStatus === "sending" || formStatus === "sent"}
+                className="w-full bg-term-green text-term-bg font-semibold rounded px-4 py-2.5 hover:bg-term-bright transition-colors disabled:opacity-70"
+              >
+                {formStatus === "sending" && "sending... "}
+                {formStatus === "sent" && "✓ message sent"}
+                {formStatus === "error" && "✗ failed — retry"}
+                {formStatus === "idle" && "$ ./send"}
+              </button>
+            </motion.form>
           </div>
         </div>
       </section>
+
+      {/* ---------------- status bar / footer ---------------- */}
+      <footer className="border-t border-term-border px-4 md:px-6 py-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-term-dim">
+          <div className="flex items-center gap-2">
+            <span className="text-term-green">●</span> all systems operational
+          </div>
+          <div>© {new Date().getFullYear()} Dat Bui — built with Next.js</div>
+          <div className="font-mono-term tabular-nums">{clock || "--:--:--"}</div>
+        </div>
+      </footer>
     </div>
   )
 }

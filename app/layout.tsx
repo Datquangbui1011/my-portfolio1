@@ -64,7 +64,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         // Apply the configured fonts and additional styles to the body element
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} font-mono-term antialiased bg-term-bg text-term-text`}
       >
         {children}
       </body>
