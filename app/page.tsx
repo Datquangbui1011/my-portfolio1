@@ -2,9 +2,10 @@
 
 import type React from "react"
 import { ExternalLink, ArrowDownRight, ArrowUpRight, ArrowUp } from "lucide-react"
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion"
+import { motion, useScroll, useTransform, useSpring } from "framer-motion"
 import { useEffect, useState } from "react"
 import { useRef } from "react"
+import TechMarquee from "@/components/TechMarquee"
 
 
 const skills = {
@@ -95,10 +96,42 @@ const projects = [
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("hero");
   const [availableDate, setAvailableDate] = useState("");
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const { scrollY } = useScroll();
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setFormStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: (form.elements.namedItem("name") as HTMLInputElement).value,
+          company: (form.elements.namedItem("company") as HTMLInputElement).value,
+          note: (form.elements.namedItem("note") as HTMLTextAreaElement).value,
+        }),
+      });
+      if (res.ok) {
+        setFormStatus("sent");
+        form.reset();
+        setTimeout(() => setFormStatus("idle"), 3000);
+      } else {
+        setFormStatus("error");
+        setTimeout(() => setFormStatus("idle"), 3000);
+      }
+    } catch {
+      setFormStatus("error");
+      setTimeout(() => setFormStatus("idle"), 3000);
+    }
+  };
+
+  const { scrollY, scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
   const heroY = useTransform(scrollY, [0, 500], [0, -150]);
+
+  // Smooth top scroll-progress indicator
+  const progressScaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
 
   const experienceRef = useRef<HTMLElement>(null);
 
@@ -149,20 +182,29 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="min-h-screen bg-beige font-sans selection:bg-dark selection:text-beige transition-colors duration-700">
+    <div className="min-h-screen bg-beige font-sans selection:bg-gold selection:text-dark transition-colors duration-700">
+      {/* Scroll progress bar */}
+      <motion.div
+        style={{ scaleX: progressScaleX }}
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gold z-[60] origin-left"
+      />
+
       {/* Navigation */}
-      <motion.nav 
+      <motion.nav
         style={{ opacity: heroOpacity, y: heroY }}
         className={`fixed top-0 left-0 right-0 z-50 py-6 px-6 md:px-12 flex justify-between items-center transition-colors duration-500 ${getNavColor()}`}
       >
         <div className="overflow-hidden">
-          <motion.div
+          <motion.a
+            href="#hero"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-2 text-sm md:text-lg font-medium tracking-tight group"
           >
-            <span className="text-sm md:text-lg font-medium tracking-tight">Full-Stack Software Engineer</span>
-          </motion.div>
+            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+            <span className="group-hover:text-gold transition-colors">Full-Stack Software Engineer</span>
+          </motion.a>
         </div>
         <div className="hidden md:flex gap-8 text-sm uppercase tracking-widest font-bold overflow-hidden">
           {["experience", "works", "about", "contact"].map((item, i) => (
@@ -172,7 +214,12 @@ export default function Portfolio() {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.7, delay: 0.9 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
               >
-                <a href={`#${item}`} className="hover:opacity-70 transition-opacity capitalize">{item}</a>
+                <a href={`#${item}`} className="relative capitalize transition-colors hover:text-gold">
+                  {item}
+                  <span
+                    className={`absolute -bottom-1.5 left-0 h-[2px] bg-gold transition-all duration-300 ${activeSection === item ? "w-full" : "w-0"}`}
+                  />
+                </a>
               </motion.div>
             </div>
           ))}
@@ -180,13 +227,20 @@ export default function Portfolio() {
       </motion.nav>
 
 {/* Hero Section */}
-<motion.section 
-  id="hero" 
+<motion.section
+  id="hero"
   style={{ opacity: heroOpacity, y: heroY }}
-  className="bg-beige min-h-screen flex flex-col justify-between relative pt-24 pb-12 px-6 md:px-12 overflow-hidden text-dark"
+  className="grain bg-beige min-h-screen flex flex-col justify-between relative pt-24 pb-12 px-6 md:px-12 overflow-hidden text-dark"
 >
+  {/* Animated aurora backdrop */}
+  <div className="absolute inset-0 -z-0 pointer-events-none overflow-hidden">
+    <div className="aurora-blob absolute -top-1/4 -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gold/25 blur-[120px]" />
+    <div className="aurora-blob absolute top-1/3 right-[-10%] w-[45vw] h-[45vw] rounded-full bg-olive/30 blur-[130px]" style={{ animationDelay: "-6s" }} />
+    <div className="aurora-blob absolute bottom-[-15%] left-1/4 w-[40vw] h-[40vw] rounded-full bg-gold-soft/20 blur-[110px]" style={{ animationDelay: "-12s" }} />
+  </div>
+
   {/* BIG NAME — masked slide-up reveal */}
-  <div className="w-full overflow-hidden">
+  <div className="relative z-10 w-full overflow-hidden">
     <motion.div
       initial={{ y: '100%' }}
       animate={{ y: 0 }}
@@ -203,7 +257,7 @@ export default function Portfolio() {
   </div>
 
   {/* Bottom 3-col layout */}
-  <div className="flex flex-col md:flex-row items-end justify-between gap-12 mt-8">
+  <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-12 mt-8">
     {/* Left — description + CTA */}
     <div className="flex flex-col gap-6 max-w-xs">
       <div className="overflow-hidden">
@@ -260,7 +314,9 @@ export default function Portfolio() {
           animate={{ y: 0 }}
           transition={{ duration: 0.7, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-dark/60 mb-1">Available for work</div>
+          <div className="flex items-center justify-end gap-2 text-xs font-bold uppercase tracking-[0.2em] text-dark/60 mb-1">
+            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" /> Available for work
+          </div>
         </motion.div>
       </div>
       <div className="overflow-hidden">
@@ -269,12 +325,35 @@ export default function Portfolio() {
           animate={{ y: 0 }}
           transition={{ duration: 0.8, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="text-5xl md:text-6xl font-black tracking-tight">{availableDate}</div>
+          <div className="text-5xl md:text-6xl font-black tracking-tight">
+            {availableDate.split("'")[0]}
+            <span className="text-gold">'{availableDate.split("'")[1]}</span>
+          </div>
         </motion.div>
       </div>
     </div>
   </div>
+
+  {/* Scroll cue */}
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 1.6, duration: 1 }}
+    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2"
+  >
+    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-dark/40">Scroll</span>
+    <div className="w-[1px] h-12 bg-dark/20 overflow-hidden">
+      <motion.div
+        animate={{ y: ["-100%", "100%"] }}
+        transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+        className="w-full h-1/2 bg-gold"
+      />
+    </div>
+  </motion.div>
 </motion.section>
+
+{/* Tech marquee — animated logo strip */}
+<TechMarquee />
 
       {/* Experience Section */}
       <section 
@@ -283,7 +362,7 @@ export default function Portfolio() {
       >
         {/* Sticky Header */}
         <div className="sticky top-0 px-6 md:px-12 pt-24 md:pt-32 pb-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8 z-0 bg-dark w-full border-b border-beige/10">
-          <h2 className="text-4xl md:text-6xl font-black shrink-0 tracking-tighter">EXPERIENCE /</h2>
+          <h2 className="text-4xl md:text-6xl font-black shrink-0 tracking-tighter">EXPERIENCE <span className="text-gold">/</span></h2>
           <p className="max-w-md text-lg md:text-xl leading-relaxed font-medium text-beige/80 tracking-tight">
             {/* A background in technical support, software engineering, and teaching, blending problem solving with practical application. */}
           </p>
@@ -303,8 +382,8 @@ export default function Portfolio() {
                 <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start pb-24">
                   
                   {/* Big Number */}
-                  <div className="text-6xl md:text-[8rem] font-medium font-mono leading-none text-beige flex-shrink-0">
-                    0{i+1}
+                  <div className="text-6xl md:text-[8rem] font-medium font-mono leading-none flex-shrink-0">
+                    <span className="text-beige/20">0</span><span className="text-gold">{i+1}</span>
                   </div>
                   
                   {/* Content */}
@@ -337,8 +416,8 @@ export default function Portfolio() {
       {/* Works Section */}
       <section id="works" className="bg-dark text-beige pt-32 pb-16 transition-colors duration-700">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 px-6 md:px-12 md:border-b border-beige/10 pb-12 gap-4 max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter">SELECTED WORKS /</h2>
-          <span className="uppercase text-sm font-bold tracking-[0.2em] text-beige/50">(PROJECTS)</span>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter">SELECTED WORKS <span className="text-gold">/</span></h2>
+          <span className="uppercase text-sm font-bold tracking-[0.2em] text-beige/50">({projects.length.toString().padStart(2, "0")} PROJECTS)</span>
         </div>
         
         <div ref={worksRef} className="flex flex-col md:flex-row relative max-w-7xl mx-auto px-6 md:px-12">
@@ -346,7 +425,7 @@ export default function Portfolio() {
           {/* Left Column: Sticky Number Odometer */}
           <div className="hidden md:flex w-1/3 sticky top-0 h-screen items-center overflow-hidden">
             <div className="text-[12rem] lg:text-[18rem] font-medium font-mono leading-none tracking-tighter flex items-start h-[12rem] lg:h-[18rem] overflow-hidden text-beige -ml-4">
-              <span className="h-full flex items-center justify-center">0</span>
+              <span className="h-full flex items-center justify-center text-beige/25">0</span>
               <motion.div
                 animate={{ y: `-${activeProject * (100 / projects.length)}%` }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -373,7 +452,7 @@ export default function Portfolio() {
                 {/* Mobile number display */}
                 <div className="md:hidden text-6xl font-medium text-beige/20 font-mono mb-4">0{i+1}</div>
                 
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-beige/10 bg-dark group-hover:shadow-[0_0_50px_rgba(214,215,207,0.1)] transition-shadow duration-700">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-beige/10 group-hover:border-gold/40 bg-dark group-hover:shadow-[0_0_60px_rgba(216,166,78,0.18)] transition-all duration-700">
                   <div className="absolute inset-0 bg-dark/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                   <img src={proj.image} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 origin-center" />
                   
@@ -390,11 +469,11 @@ export default function Portfolio() {
                 </div>
                 
                 <div>
-                  <h3 className="text-3xl md:text-5xl font-bold mb-4 tracking-tighter">{proj.title}</h3>
+                  <h3 className="text-3xl md:text-5xl font-bold mb-4 tracking-tighter transition-colors group-hover:text-gold">{proj.title}</h3>
                   <p className="text-beige/60 mb-8 text-lg leading-relaxed font-medium">{proj.description}</p>
                   <div className="flex flex-wrap gap-2">
                     {proj.technologies.map(t => (
-                      <span key={t} className="text-xs font-bold uppercase tracking-widest border border-beige/20 px-3 py-1.5 rounded-full text-beige/80">{t}</span>
+                      <span key={t} className="text-xs font-bold uppercase tracking-widest border border-beige/20 px-3 py-1.5 rounded-full text-beige/80 hover:border-gold/60 hover:text-gold transition-colors">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -409,11 +488,11 @@ export default function Portfolio() {
         <motion.div 
           ref={aboutRef}
           style={{ scale: aboutScale, borderRadius: aboutBorderRadius, y: aboutY }}
-          className="bg-olive text-beige py-32 px-6 md:px-12 origin-top overflow-hidden"
+          className="grain bg-olive text-beige py-32 px-6 md:px-12 origin-top overflow-hidden"
         >
           <div className="grid md:grid-cols-2 gap-24 max-w-7xl mx-auto">
             <div>
-              <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter">ABOUT ME /</h2>
+              <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter">ABOUT ME <span className="text-gold">/</span></h2>
               <div className="space-y-8 text-xl md:text-2xl leading-relaxed text-beige/80 font-medium tracking-tight">
                 <p>I'm a Junior student at the University of Nebraska–Lincoln, pursuing a bachelor's degree in Computer Science with a minor in Mathematics.</p>
                 <p>I grew up in Bien Hoa, Vietnam, and have lived in Lincoln for 4 years.</p>
@@ -428,7 +507,7 @@ export default function Portfolio() {
                     <h3 className="uppercase font-bold tracking-[0.2em] text-sm text-beige/50 mb-6">{category}</h3>
                     <div className="flex flex-wrap gap-3">
                       {list.map(s => (
-                        <span key={s} className="bg-beige/10 px-4 py-2 text-sm font-medium">{s}</span>
+                        <span key={s} className="bg-beige/10 px-4 py-2 text-sm font-medium rounded-md hover:bg-gold hover:text-dark transition-colors cursor-default">{s}</span>
                       ))}
                     </div>
                   </div>
@@ -440,14 +519,18 @@ export default function Portfolio() {
       </section>
 
       {/* Contact & Footer Section */}
-      <section id="contact" className="bg-dark text-beige py-24 px-6 md:px-12">
-        <div className="max-w-5xl mx-auto">
+      <section id="contact" className="grain bg-dark text-beige py-24 px-6 md:px-12 relative overflow-hidden">
+        {/* soft gold glow */}
+        <div className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[60vw] h-[40vw] rounded-full bg-gold/10 blur-[140px] pointer-events-none" />
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row gap-16 md:gap-24 mb-24">
             {/* Left: Heading */}
             <div className="md:w-1/2 flex flex-col justify-center">
-              <div className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-6 border border-beige/20 px-4 py-1.5 rounded-full w-fit">Got a project?</div>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">LET'S WORK<br/>TOGETHER</h2>
-              <a href="mailto:quangdatbui10112004@gmail.com" className="text-beige/60 hover:text-white transition-colors font-medium text-lg flex items-center gap-2 group w-fit">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-6 border border-beige/20 px-4 py-1.5 rounded-full w-fit">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" /> Got a project?
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">LET'S WORK<br/><span className="text-gold">TOGETHER</span></h2>
+              <a href="mailto:quangdatbui10112004@gmail.com" className="text-beige/60 hover:text-gold transition-colors font-medium text-lg flex items-center gap-2 group w-fit">
                 quangdatbui10112004@gmail.com
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"/>
               </a>
@@ -455,72 +538,48 @@ export default function Portfolio() {
 
             {/* Right: Form */}
             <div className="md:w-1/2">
-              <form className="flex flex-col gap-6" onSubmit={async (e) => { 
-                e.preventDefault(); 
-                const form = e.target as HTMLFormElement; 
-                const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                btn.textContent = 'Sending...';
-                btn.disabled = true;
-                try {
-                  const res = await fetch('/api/contact', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      name: (form.elements.namedItem('name') as HTMLInputElement).value,
-                      company: (form.elements.namedItem('company') as HTMLInputElement).value,
-                      note: (form.elements.namedItem('note') as HTMLTextAreaElement).value,
-                    }),
-                  });
-                  if (res.ok) {
-                    btn.textContent = '✓ Sent!';
-                    form.reset();
-                    setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 3000);
-                  } else {
-                    btn.textContent = 'Failed — Try Again';
-                    setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 3000);
-                  }
-                } catch {
-                  btn.textContent = 'Error — Try Again';
-                  setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 3000);
-                }
-              }}>
+              <form className="flex flex-col gap-6" onSubmit={handleContactSubmit}>
                 <div>
                   <label htmlFor="name" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Name</label>
-                  <input 
-                    id="name" 
-                    name="name" 
-                    type="text" 
-                    required 
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
                     placeholder="Your name"
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-beige/60 transition-colors"
+                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors"
                   />
                 </div>
                 <div>
                   <label htmlFor="company" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Company</label>
-                  <input 
-                    id="company" 
-                    name="company" 
-                    type="text" 
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
                     placeholder="Your company"
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-beige/60 transition-colors"
+                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors"
                   />
                 </div>
                 <div>
                   <label htmlFor="note" className="text-xs font-bold uppercase tracking-[0.2em] text-beige/50 mb-2 block">Note</label>
-                  <textarea 
-                    id="note" 
-                    name="note" 
-                    rows={4} 
+                  <textarea
+                    id="note"
+                    name="note"
+                    rows={4}
                     required
                     placeholder="Tell me about your project..."
-                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-beige/60 transition-colors resize-none"
+                    className="w-full bg-transparent border-b border-beige/20 py-3 text-lg font-medium text-beige placeholder:text-beige/30 focus:outline-none focus:border-gold transition-colors resize-none"
                   />
                 </div>
-                <button 
-                  type="submit" 
-                  className="mt-4 bg-beige text-dark px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform w-fit self-start"
+                <button
+                  type="submit"
+                  disabled={formStatus === "sending" || formStatus === "sent"}
+                  className="mt-4 bg-beige text-dark px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-gold hover:scale-105 transition-all w-fit self-start disabled:opacity-70 disabled:hover:scale-100"
                 >
-                  Send Message
+                  {formStatus === "sending" && "Sending..."}
+                  {formStatus === "sent" && "✓ Sent!"}
+                  {formStatus === "error" && "Failed — Try Again"}
+                  {formStatus === "idle" && "Send Message"}
                 </button>
               </form>
             </div>
@@ -529,11 +588,11 @@ export default function Portfolio() {
           {/* Footer */}
           <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-beige/10 pt-12 text-beige/50 text-sm font-bold tracking-widest gap-8">
             <div className="flex gap-8">
-              <a href="https://github.com/Datquangbui1011" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GITHUB</a>
-              <a href="https://www.linkedin.com/in/datbui1011/" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">LINKEDIN</a>
+              <a href="https://github.com/Datquangbui1011" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">GITHUB</a>
+              <a href="https://www.linkedin.com/in/datbui1011/" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">LINKEDIN</a>
             </div>
             <div>© {new Date().getFullYear()} DAT BUI</div>
-            <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="hover:text-white transition-colors flex items-center gap-2">
+            <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="hover:text-gold transition-colors flex items-center gap-2">
               BACK TO TOP <ArrowUp className="w-4 h-4"/>
             </button>
           </div>

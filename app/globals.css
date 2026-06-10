@@ -7,6 +7,8 @@
   --color-beige: #d6d7cf;
   --color-olive: #2a2a24;
   --color-dark: #000000;
+  --color-gold: #d8a64e;
+  --color-gold-soft: #e8c585;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -133,4 +135,69 @@
 /* Custom Utilities */
 .bg-grid-white {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.05)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+/* Film-grain texture overlay — sits above backgrounds, ignores pointer events */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Slow-drifting aurora blobs for the hero backdrop */
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(6%, -4%, 0) scale(1.15);
+  }
+  66% {
+    transform: translate3d(-5%, 5%, 0) scale(0.95);
+  }
+}
+.aurora-blob {
+  animation: aurora-drift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Marquee strip used on section headers */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-x 30s linear infinite;
+}
+
+/* Custom scrollbar to match the palette */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a24;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .animate-marquee {
+    animation: none;
+  }
 }
