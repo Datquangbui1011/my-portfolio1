@@ -505,24 +505,58 @@ export default function Portfolio() {
       <section id="about" className="px-4 md:px-6 py-24 border-t border-term-border">
         <div className="max-w-5xl mx-auto">
           <SectionHeading cmd="cat about.system" comment="who is running this process" />
-          <motion.div {...reveal} className="grid md:grid-cols-3 gap-8 items-start">
-            <div className="md:col-span-2 space-y-5 text-term-text/90 leading-relaxed">
-              <p>
-                <span className="text-term-green">const</span> me ={" "}
-                <span className="text-term-amber">"Dat Bui"</span> — a Senior at the University of
-                Nebraska–Lincoln pursuing a B.S. in Computer Science with a minor in Mathematics.
-              </p>
-              <p>
-                I grew up in Bien Hoa, Vietnam, and have lived in Lincoln for 4 years. My background
-                spans customer service, teaching, and IT — and has since converged on software
-                engineering.
-              </p>
-              <p>
-                I build fast, modern applications, automate the boring parts, and I&apos;m always
-                shipping something new. Always eager to gain hands-on experience across computing.
-              </p>
+          <motion.div {...reveal} className="grid md:grid-cols-6 gap-5 items-start">
+            {/* bio — about.md */}
+            <div className="md:col-span-4 rounded-lg border border-term-border bg-term-panel/50 overflow-hidden flex flex-col">
+              <WindowChrome title="about.md — readme" />
+              <div className="p-6 space-y-5 text-term-text/90 leading-relaxed text-[15px]">
+                <p>
+                  <span className="text-term-dim"># </span>
+                  <span className="text-term-bright">whoami</span>
+                </p>
+                <p>
+                  <span className="text-term-green">const</span> me ={" "}
+                  <span className="text-term-amber">"Dat Bui"</span> — a Senior at the University of
+                  Nebraska–Lincoln, pursuing a B.S. in Computer Science with a minor in Mathematics.
+                  I work at the intersection of software engineering, AI, and machine learning,
+                  where I&apos;m most excited about building systems that turn messy real-world
+                  problems into clean, working products.
+                </p>
+                <p>
+                  I grew up in Bien Hoa, Vietnam, and have called Lincoln home for the past 4 years.
+                  My path here wasn&apos;t a straight line — it wound through customer service,
+                  teaching, and IT before converging on software engineering. Each stop taught me
+                  something I still lean on: how to listen to people, how to explain hard ideas
+                  simply, and how to keep systems running when things break.
+                </p>
+                <p>
+                  These days I build fast, modern web applications, train and apply machine learning
+                  models, and automate the boring parts so the interesting work gets more room. I
+                  care about clean architecture, thoughtful UX, and code that holds up under
+                  pressure — and I&apos;m happiest when I&apos;m shipping something new.
+                </p>
+                <p>
+                  Outside of deadlines, I&apos;m endlessly curious about how things work across the
+                  whole stack — from low-level systems to the math behind modern AI. I&apos;m always
+                  eager to gain hands-on experience, take on harder problems, and grow alongside the
+                  people I build with.
+                </p>
+                <div className="pt-2">
+                  <a
+                    href="/Resume.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded border border-term-green/40 bg-term-green/10 px-4 py-2 text-sm text-term-green hover:bg-term-green/20 hover:border-term-green transition-colors"
+                  >
+                    <span className="text-term-dim">$</span> download resume.pdf
+                    <span className="text-term-dim">↗</span>
+                  </a>
+                </div>
+              </div>
             </div>
-            <div className="space-y-5">
+
+            {/* sidebar — photo · stats · now playing */}
+            <div className="md:col-span-2 flex flex-col gap-5">
               {/* photo viewer */}
               <div className="group rounded-lg border border-term-border bg-term-panel/50 overflow-hidden hover:border-term-green/40 transition-colors">
                 <div className="flex items-center justify-between px-3 py-2 border-b border-term-border text-xs">
@@ -547,12 +581,56 @@ export default function Portfolio() {
               <div className="rounded-lg border border-term-border bg-term-panel/50 p-5 text-sm">
                 <div className="text-term-dim mb-3">// quick stats</div>
                 <ul className="space-y-2">
-                  <li className="flex justify-between"><span className="text-term-dim">uptime</span><span className="text-term-text">4+ yrs in Lincoln</span></li>
-                  <li className="flex justify-between"><span className="text-term-dim">focus</span><span className="text-term-green">AI, Machine learning, Full-stack</span></li>
-                  <li className="flex justify-between"><span className="text-term-dim">edu</span><span className="text-term-text">CS @ UNL</span></li>
-                  <li className="flex justify-between"><span className="text-term-dim">minor</span><span className="text-term-text">Mathematics</span></li>
-                  <li className="flex justify-between"><span className="text-term-dim">status</span><span className="text-term-bright term-glow">● open</span></li>
+                  <li className="flex justify-between gap-2"><span className="text-term-dim">uptime</span><span className="text-term-text text-right">4+ yrs in Lincoln</span></li>
+                  <li className="flex justify-between gap-2"><span className="text-term-dim">focus</span><span className="text-term-green text-right">AI · ML · Full-stack</span></li>
+                  <li className="flex justify-between gap-2"><span className="text-term-dim">edu</span><span className="text-term-text text-right">CS @ UNL</span></li>
+                  <li className="flex justify-between gap-2"><span className="text-term-dim">minor</span><span className="text-term-text text-right">Mathematics</span></li>
+                  <li className="flex justify-between gap-2"><span className="text-term-dim">status</span><span className="text-term-bright term-glow text-right">● open</span></li>
                 </ul>
+              </div>
+
+              {/* now playing */}
+              <div className="rounded-lg border border-term-border bg-term-panel/50 overflow-hidden">
+                <div className="flex items-center justify-between px-3 py-2 border-b border-term-border text-xs">
+                  <span className="text-term-dim">
+                    <span className="text-term-green">$</span> now-playing --loop
+                  </span>
+                  <span className="text-term-green flex items-center gap-1">
+                    <span className="inline-block h-2 w-2 rounded-full bg-term-green animate-pulse" />
+                    on repeat
+                  </span>
+                </div>
+                <div className="aspect-video">
+                  <iframe
+                    src="https://www.youtube.com/embed/YSWrmX4_qFA"
+                    title="Dat's favorite track"
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+                <div className="px-3 py-2 text-xs space-y-1.5 border-t border-term-border">
+                  <div className="flex justify-between">
+                    <span className="text-term-dim">artist</span>
+                    <a
+                      href="https://music.youtube.com/@maroon5"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-term-green hover:text-term-bright transition-colors"
+                    >
+                      Maroon 5 ↗
+                    </a>
+                  </div>
+                  <a
+                    href="https://music.youtube.com/@maroon5"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block text-term-dim hover:text-term-green transition-colors"
+                  >
+                    <span className="text-term-green">$</span> open in youtube music ↗
+                  </a>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -765,48 +843,72 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            <motion.form {...reveal} onSubmit={handleSubmit} className="space-y-4">
-              {[
-                { id: "name", label: "name", type: "text", required: true, placeholder: "your name" },
-                { id: "company", label: "company", type: "text", required: false, placeholder: "optional" },
-              ].map((f) => (
-                <div key={f.id}>
-                  <label htmlFor={f.id} className="block text-xs text-term-dim mb-1">
-                    <span className="text-term-green">const</span> {f.label} =
-                  </label>
-                  <input
-                    id={f.id}
-                    name={f.id}
-                    type={f.type}
-                    required={f.required}
-                    placeholder={f.placeholder}
-                    className="w-full bg-term-bg border border-term-border rounded px-3 py-2 text-sm text-term-text placeholder:text-term-dim focus:outline-none focus:border-term-green transition-colors"
-                  />
-                </div>
-              ))}
-              <div>
-                <label htmlFor="note" className="block text-xs text-term-dim mb-1">
-                  <span className="text-term-green">const</span> message =
-                </label>
-                <textarea
-                  id="note"
-                  name="note"
-                  rows={4}
-                  required
-                  placeholder="tell me about your project..."
-                  className="w-full bg-term-bg border border-term-border rounded px-3 py-2 text-sm text-term-text placeholder:text-term-dim focus:outline-none focus:border-term-green transition-colors resize-none"
-                />
+            <motion.form
+              {...reveal}
+              onSubmit={handleSubmit}
+              className="rounded-lg border border-term-border bg-term-bg font-mono text-sm overflow-hidden"
+            >
+              {/* terminal title bar */}
+              <div className="flex items-center gap-2 border-b border-term-border bg-term-panel/60 px-3 py-2">
+                <span className="h-3 w-3 rounded-full bg-term-red/80" />
+                <span className="h-3 w-3 rounded-full bg-term-amber/80" />
+                <span className="h-3 w-3 rounded-full bg-term-green/80" />
+                <span className="ml-2 text-xs text-term-dim">contact — bash</span>
               </div>
-              <button
-                type="submit"
-                disabled={formStatus === "sending" || formStatus === "sent"}
-                className="w-full bg-term-green text-term-bg font-semibold rounded px-4 py-2.5 hover:bg-term-bright transition-colors disabled:opacity-70"
-              >
-                {formStatus === "sending" && "sending... "}
-                {formStatus === "sent" && "✓ message sent"}
-                {formStatus === "error" && "✗ failed — retry"}
-                {formStatus === "idle" && "$ ./send"}
-              </button>
+
+              {/* prompt lines */}
+              <div className="space-y-3 p-4">
+                {[
+                  { id: "name", type: "text", required: true, placeholder: "your name" },
+                  { id: "company", type: "text", required: false, placeholder: "(optional)" },
+                ].map((f) => (
+                  <label
+                    key={f.id}
+                    htmlFor={f.id}
+                    className="flex items-baseline gap-2 cursor-text"
+                  >
+                    <span className="shrink-0 text-term-green">
+                      guest@portfolio:~$ <span className="text-term-dim">{f.id} </span>
+                    </span>
+                    <input
+                      id={f.id}
+                      name={f.id}
+                      type={f.type}
+                      required={f.required}
+                      placeholder={f.placeholder}
+                      className="flex-1 bg-transparent border-none p-0 text-term-text caret-term-green placeholder:text-term-dim focus:outline-none focus:ring-0"
+                    />
+                  </label>
+                ))}
+
+                <label htmlFor="note" className="flex items-baseline gap-2 cursor-text">
+                  <span className="shrink-0 text-term-green">
+                    guest@portfolio:~$ <span className="text-term-dim">message </span>
+                  </span>
+                  <textarea
+                    id="note"
+                    name="note"
+                    rows={4}
+                    required
+                    placeholder="tell me about your project..."
+                    className="flex-1 bg-transparent border-none p-0 text-term-text caret-term-green placeholder:text-term-dim focus:outline-none focus:ring-0 resize-none"
+                  />
+                </label>
+              </div>
+
+              {/* run button styled as a command */}
+              <div className="border-t border-term-border px-4 py-3">
+                <button
+                  type="submit"
+                  disabled={formStatus === "sending" || formStatus === "sent"}
+                  className="w-full text-left text-term-green hover:text-term-bright transition-colors disabled:opacity-70 disabled:hover:text-term-green"
+                >
+                  {formStatus === "sending" && <>guest@portfolio:~$ ./send <span className="text-term-dim">sending...</span><span className="term-cursor align-middle" /></>}
+                  {formStatus === "sent" && <>guest@portfolio:~$ ./send <span className="text-term-bright">✓ message sent</span></>}
+                  {formStatus === "error" && <>guest@portfolio:~$ ./send <span className="text-term-red">✗ failed — retry</span></>}
+                  {formStatus === "idle" && <>guest@portfolio:~$ ./send<span className="term-cursor align-middle" /></>}
+                </button>
+              </div>
             </motion.form>
           </div>
         </div>
