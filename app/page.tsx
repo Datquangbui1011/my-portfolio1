@@ -208,7 +208,7 @@ const bootLines: { text: string; className?: string; delay?: number }[] = [
   { text: "Loading kernel modules ............... [ OK ]", className: "text-term-dim" },
   { text: "SYSTEM.KERNEL :: v4.8.0 ONLINE", className: "text-term-green term-glow" },
   { text: "", },
-  { text: "> role    : Full-Stack Software Engineer", className: "text-term-text" },
+  { text: "> role    : AI, Machine Learning & Full-Stack Software Engineer", className: "text-term-text" },
   { text: "> status  : available for work", className: "text-term-text" },
   { text: "> loc     : Lincoln, NE", className: "text-term-text" },
   { text: "> while (alive) { code(); learn(); ship(); }", className: "text-term-cyan" },
@@ -509,7 +509,7 @@ export default function Portfolio() {
             <div className="md:col-span-2 space-y-5 text-term-text/90 leading-relaxed">
               <p>
                 <span className="text-term-green">const</span> me ={" "}
-                <span className="text-term-amber">"Dat Bui"</span> — a Junior at the University of
+                <span className="text-term-amber">"Dat Bui"</span> — a Senior at the University of
                 Nebraska–Lincoln pursuing a B.S. in Computer Science with a minor in Mathematics.
               </p>
               <p>
@@ -547,8 +547,8 @@ export default function Portfolio() {
               <div className="rounded-lg border border-term-border bg-term-panel/50 p-5 text-sm">
                 <div className="text-term-dim mb-3">// quick stats</div>
                 <ul className="space-y-2">
-                  <li className="flex justify-between"><span className="text-term-dim">uptime</span><span className="text-term-text">3+ yrs in Lincoln</span></li>
-                  <li className="flex justify-between"><span className="text-term-dim">focus</span><span className="text-term-green">full-stack</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">uptime</span><span className="text-term-text">4+ yrs in Lincoln</span></li>
+                  <li className="flex justify-between"><span className="text-term-dim">focus</span><span className="text-term-green">AI, Machine learning, Full-stack</span></li>
                   <li className="flex justify-between"><span className="text-term-dim">edu</span><span className="text-term-text">CS @ UNL</span></li>
                   <li className="flex justify-between"><span className="text-term-dim">minor</span><span className="text-term-text">Mathematics</span></li>
                   <li className="flex justify-between"><span className="text-term-dim">status</span><span className="text-term-bright term-glow">● open</span></li>
